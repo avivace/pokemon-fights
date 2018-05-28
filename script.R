@@ -1,5 +1,5 @@
-options(width=100)
-knitr::opts_chunk$set(out.width='1000px',dpi=200,message=FALSE,warning=FALSE)
+#options(width=100)
+#knitr::opts_chunk$set(out.width='1000px',dpi=200,message=FALSE,warning=FALSE)
 
 # Librerie da importare ed installare se non presenti
 library(ggplot2)
@@ -21,40 +21,40 @@ pokemon<-read.csv("./pokemon.csv",sep=",",stringsAsFactors=F)
 colnames(pokemon)<-c("id","Name","Type.1","Type.2","HP","Attack","Defense","Sp.Atk","Sp.Def","Speed","Generation","Legendary")
 
 Type.1<-c("Dragon","Steel","Flying","Psychic","Rock" ,"Fire","Electric" ,"Dark","Ghost" ,"Ground","Ice", "Water","Grass","Fighting", "Fairy" ,"Poison","Normal","Bug")
-color<-c("#6F35FC","#B7B7CE","#A98FF3","#F95587","#B6A136","#EE8130","#F7D02C","#705746","#735797","#E2BF65","#96D9D6","#6390F0","#7AC74C","#C22E28","#D685AD","#A33EA1","#A8A77A","#A6B91A")
+#color<-c("#6F35FC","#B7B7CE","#A98FF3","#F95587","#B6A136","#EE8130","#F7D02C","#705746","#735797","#E2BF65","#96D9D6","#6390F0","#7AC74C","#C22E28","#D685AD","#A33EA1","#A8A77A","#A6B91A")
 
-# Creo tabella associazione tipo, colore
-COL<-data.frame(Type.1,color)
-
-# Mostro grafico della distribuzione dei pokemon in base al tipo
-merge(
-  merge(pokemon %>% dplyr::group_by(Type.1) %>% dplyr::summarize(tot=n()),
-        pokemon %>% dplyr::group_by(Type.1,Legendary) %>% dplyr::summarize(count=n()),by='Type.1'),
-  COL, by='Type.1') %>% 
-  ggplot(aes(x=reorder(Type.1,tot),y=count)) + 
-  geom_bar(aes(fill=color,alpha=Legendary),color='white',size=.25,stat='identity') + 
-  scale_fill_identity() + coord_flip() + theme_fivethirtyeight() + 
-  ggtitle("Pokemon Distribution") + scale_alpha_discrete(range=c(.9,.6))
-
-# Mostro con un Radarchart la distrubuzione delle caratteristiche in base al tipo 
-
-res<-data.frame(pokemon %>% dplyr::select(Type.1,HP, Attack, Defense, Sp.Atk, Sp.Def, Speed) %>% dplyr::group_by(Type.1) %>% dplyr::summarise_all(funs(mean)) %>% mutate(sumChars = HP + Attack + Defense + Sp.Atk + Sp.Def + Speed) %>% arrange(-sumChars))
-res$color<-color
-max<- ceiling(apply(res[,2:7], 2, function(x) max(x, na.rm = TRUE)) %>% sapply(as.double)) %>% as.vector
-min<-rep.int(0,6)
-
-par(mfrow=c(3,6))
-par(mar=c(1,1,1,1))
-for(i in 1:nrow(res)){
-  curCol<-(col2rgb(as.character(res$color[i]))%>% as.integer())/255
-  radarchart(rbind(max,min,res[i,2:7]),
-             axistype=2 , 
-             pcol=rgb(curCol[1],curCol[2],curCol[3], alpha = 1) ,
-             pfcol=rgb(curCol[1],curCol[2],curCol[3],.5) ,
-             plwd=2 , cglcol="grey", cglty=1, 
-             axislabcol="black", caxislabels=seq(0,2000,5), cglwd=0.8, vlcex=0.8,
-             title=as.character(res$Type.1[i]))
-}
+# # Creo tabella associazione tipo, colore
+# COL<-data.frame(Type.1,color)
+# 
+# # Mostro grafico della distribuzione dei pokemon in base al tipo
+# merge(
+#   merge(pokemon %>% dplyr::group_by(Type.1) %>% dplyr::summarize(tot=n()),
+#         pokemon %>% dplyr::group_by(Type.1,Legendary) %>% dplyr::summarize(count=n()),by='Type.1'),
+#   COL, by='Type.1') %>% 
+#   ggplot(aes(x=reorder(Type.1,tot),y=count)) + 
+#   geom_bar(aes(fill=color,alpha=Legendary),color='white',size=.25,stat='identity') + 
+#   scale_fill_identity() + coord_flip() + theme_fivethirtyeight() + 
+#   ggtitle("Pokemon Distribution") + scale_alpha_discrete(range=c(.9,.6))
+# 
+# # Mostro con un Radarchart la distrubuzione delle caratteristiche in base al tipo 
+# 
+# res<-data.frame(pokemon %>% dplyr::select(Type.1,HP, Attack, Defense, Sp.Atk, Sp.Def, Speed) %>% dplyr::group_by(Type.1) %>% dplyr::summarise_all(funs(mean)) %>% mutate(sumChars = HP + Attack + Defense + Sp.Atk + Sp.Def + Speed) %>% arrange(-sumChars))
+# res$color<-color
+# max<- ceiling(apply(res[,2:7], 2, function(x) max(x, na.rm = TRUE)) %>% sapply(as.double)) %>% as.vector
+# min<-rep.int(0,6)
+# 
+# par(mfrow=c(3,6))
+# par(mar=c(1,1,1,1))
+# for(i in 1:nrow(res)){
+#   curCol<-(col2rgb(as.character(res$color[i]))%>% as.integer())/255
+#   radarchart(rbind(max,min,res[i,2:7]),
+#              axistype=2 , 
+#              pcol=rgb(curCol[1],curCol[2],curCol[3], alpha = 1) ,
+#              pfcol=rgb(curCol[1],curCol[2],curCol[3],.5) ,
+#              plwd=2 , cglcol="grey", cglty=1, 
+#              axislabcol="black", caxislabels=seq(0,2000,5), cglwd=0.8, vlcex=0.8,
+#              title=as.character(res$Type.1[i]))
+# }
 
 # Modeling
 
@@ -174,42 +174,84 @@ split <- createDataPartition(y=temp$winner_first_label, p = 0.75, list = FALSE)
 train <- temp[split,]
 test <- temp[-split,]
 
-regressors<-c('knn','nb','gbm','lda','svmLinear') # consideriamo solo svmLinear
 trControl <- trainControl(method = "cv",number = 5, repeats=3)
-timing<-c()
-res<-list()
-cnt<-0
 
-for(r in regressors){
-  cnt<-cnt+1
-  start.time <- Sys.time() # misura tempo
-  res[[cnt]]<-train(winner_first_label~.,data=train,method=r,trControl = trControl,metric='Accuracy') # la metrica per scegliere il modello migliore si basa sull'accuratezza
-  end.time<-Sys.time()
-  timing<-c(timing,as.numeric(difftime(end.time,start.time,units="sec")))
-}
+res<-train(winner_first_label~.,data=train,method='svmLinear',trControl = trControl,metric='Accuracy') # la metrica per scegliere il modello migliore si basa sull'accuratezza
 
-#results<-resamples(list('knn'=res[[1]],"nb"=res[[2]],"gbm"=res[[3]],"LDA"=res[[4]],"SVM"=res[[5]],"RF"=res[[6]]))
-results<-resamples(list('knn'=res[[1]],"nb"=res[[2]],"gbm"=res[[3]],"LDA"=res[[4]],"SVM"=res[[5]]))
-bwplot(results,scales = list(relation = "free"),xlim = list(c(0.5,1), c(0.5,1)))
+caret::confusionMatrix(res)
 
-caret::confusionMatrix(res[[5]])
-
-names<-c()
-for(i in 1:length(res)){
-  names[i]<-res[[i]]$method
-}
-timingData<-data.frame('classifier'=names,'val' = timing)
-ggplot(data=timingData,aes(x=reorder(classifier,val),y=val)) + 
-  geom_bar(stat='identity') + theme_fivethirtyeight() +
-  coord_flip() + 
-  xlab('') + ylab('Time [sec]') + ggtitle('Time[sec] spent by classifier')
-
-caret::confusionMatrix(res[[5]])
-
-test_pred <- predict(res[[5]], newdata = test)
+test_pred <- predict(res, newdata = test)
 confusionMatrix(as.factor(test_pred), as.factor(test$winner_first_label))
 
 # Da aggiungere il caricamento del dataset di test (tests.csv) e chiamare il metodo di predizione per ottenere i risultati 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+# Rileggo il file con i combattimenti e risultati per fare il training del modello
+real_test<-read.csv('./tests.csv',sep=",",stringsAsFactors=F)
+
+names <- pokemon %>% dplyr::select(id, Name)
+
+# Trova i nomi dei contendenti dati gli ID
+real_test$First_pokemon_name<-sapply(real_test$First_pokemon, function(x) names$Name[match(x, names$id)])
+real_test$Second_pokemon_name<-sapply(real_test$Second_pokemon, function(x) names$Name[match(x, names$id)])
+
+# Vengono recuperati i parametri dei contendenti e calcolate le differenze su alcuni di essi
+real_test$First_pokemon_attack<-sapply(real_test$First_pokemon_name, function(x) pokemon$Attack[match(x, pokemon$Name)])
+real_test$Second_pokemon_attack<-sapply(real_test$Second_pokemon_name, function(x) pokemon$Attack[match(x, pokemon$Name)])
+real_test$Diff_attack<-real_test$First_pokemon_attack - real_test$Second_pokemon_attack
+
+#real_test$winner_first_label<-ifelse(real_test$Winner==real_test$First_pokemon,'yes','no')
+
+real_test$First_pokemon_defense<-sapply(real_test$First_pokemon_name, function(x) pokemon$Defense[match(x, pokemon$Name)])
+real_test$Second_pokemon_defense<-sapply(real_test$Second_pokemon_name, function(x) pokemon$Defense[match(x, pokemon$Name)])
+real_test$Diff_defense<-real_test$First_pokemon_defense - real_test$Second_pokemon_defense
+
+real_test$First_pokemon_sp_defense<-sapply(real_test$First_pokemon_name, function(x) pokemon$Sp.Def[match(x, pokemon$Name)])
+real_test$Second_pokemon_sp_defense<-sapply(real_test$Second_pokemon_name, function(x) pokemon$Sp.Def[match(x, pokemon$Name)])
+real_test$Diff_sp_defense<-real_test$First_pokemon_sp_defense - real_test$Second_pokemon_sp_defense
+
+real_test$First_pokemon_sp_attack<-sapply(real_test$First_pokemon_name, function(x) pokemon$Sp.Atk[match(x, pokemon$Name)])
+real_test$Second_pokemon_sp_attack<-sapply(real_test$Second_pokemon_name, function(x) pokemon$Sp.Atk[match(x, pokemon$Name)])
+real_test$Diff_sp_attack<-real_test$First_pokemon_sp_attack - real_test$Second_pokemon_sp_attack
+
+real_test$First_pokemon_speed<-sapply(real_test$First_pokemon_name, function(x) pokemon$Speed[match(x, pokemon$Name)])
+real_test$Second_pokemon_speed<-sapply(real_test$Second_pokemon_name, function(x) pokemon$Speed[match(x, pokemon$Name)])
+real_test$Diff_speed<-real_test$First_pokemon_speed - real_test$Second_pokemon_speed
+
+real_test$First_pokemon_HP<-sapply(real_test$First_pokemon_name, function(x) pokemon$HP[match(x, pokemon$Name)])
+real_test$Second_pokemon_HP<-sapply(real_test$Second_pokemon_name, function(x) pokemon$HP[match(x, pokemon$Name)])
+real_test$Diff_HP<-real_test$First_pokemon_HP - real_test$Second_pokemon_HP
+
+real_test$First_pokemon_type<-sapply(real_test$First_pokemon_name, function(x) pokemon$Type.1[match(x, pokemon$Name)])
+real_test$Second_pokemon_type<-sapply(real_test$Second_pokemon_name, function(x) pokemon$Type.1[match(x, pokemon$Name)])
+real_test$First_pokemon_legendary<-sapply(real_test$First_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
+real_test$Second_pokemon_legendary<-sapply(real_test$Second_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
+
+# Fin qui tutto chiaro
+
+#scale numerical features
+temp_real_test<- data.frame(real_test %>% dplyr::select(Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary))
+# Determino quali colonne di temp sono attributi di tipo numerico
+ind <- sapply(temp_real_test, is.numeric)
+# temp[ind] contiene solo le colonne di real_test aventi valori di tipo numerico
+temp_real_test[ind] <- lapply(temp_real_test[ind], scale) # Scala le colonne
+
+trControl <- trainControl(method = "cv",number = 5, repeats=3)
+
+#res<-train(winner_first_label~.,data=temp,method='svmLinear',trControl = trControl,metric='Accuracy') # la metrica per scegliere il modello migliore si basa sull'accuratezza
+
+test_real_pred <- predict(res, newdata = temp_real_test)
+
+real_test$winner_first_label<-test_real_pred
