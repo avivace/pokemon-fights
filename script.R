@@ -1,6 +1,3 @@
-#options(width=100)
-#knitr::opts_chunk$set(out.width='1000px',dpi=200,message=FALSE,warning=FALSE)
-
 # Librerie da importare ed installare se non presenti
 library(ggplot2)
 library(dplyr)
@@ -17,109 +14,19 @@ library(magrittr)
 # Importo il file csv con l'elenco di tutti i Pokemon e relative caratteristiche
 pokemon<-read.csv("./pokemon.csv",sep=",",stringsAsFactors=F)
 
+# names contiene l'associazione id-nome del pokemon
+names <- pokemon %>% select(id, Name)
+
 # Attribuisco un nome a parametri
 colnames(pokemon)<-c("id","Name","Type.1","Type.2","HP","Attack","Defense","Sp.Atk","Sp.Def","Speed","Generation","Legendary")
 
 Type.1<-c("Dragon","Steel","Flying","Psychic","Rock" ,"Fire","Electric" ,"Dark","Ghost" ,"Ground","Ice", "Water","Grass","Fighting", "Fairy" ,"Poison","Normal","Bug")
 #color<-c("#6F35FC","#B7B7CE","#A98FF3","#F95587","#B6A136","#EE8130","#F7D02C","#705746","#735797","#E2BF65","#96D9D6","#6390F0","#7AC74C","#C22E28","#D685AD","#A33EA1","#A8A77A","#A6B91A")
 
-# # Creo tabella associazione tipo, colore
-# COL<-data.frame(Type.1,color)
-# 
-# # Mostro grafico della distribuzione dei pokemon in base al tipo
-# merge(
-#   merge(pokemon %>% dplyr::group_by(Type.1) %>% dplyr::summarize(tot=n()),
-#         pokemon %>% dplyr::group_by(Type.1,Legendary) %>% dplyr::summarize(count=n()),by='Type.1'),
-#   COL, by='Type.1') %>% 
-#   ggplot(aes(x=reorder(Type.1,tot),y=count)) + 
-#   geom_bar(aes(fill=color,alpha=Legendary),color='white',size=.25,stat='identity') + 
-#   scale_fill_identity() + coord_flip() + theme_fivethirtyeight() + 
-#   ggtitle("Pokemon Distribution") + scale_alpha_discrete(range=c(.9,.6))
-# 
-# # Mostro con un Radarchart la distrubuzione delle caratteristiche in base al tipo 
-# 
-# res<-data.frame(pokemon %>% dplyr::select(Type.1,HP, Attack, Defense, Sp.Atk, Sp.Def, Speed) %>% dplyr::group_by(Type.1) %>% dplyr::summarise_all(funs(mean)) %>% mutate(sumChars = HP + Attack + Defense + Sp.Atk + Sp.Def + Speed) %>% arrange(-sumChars))
-# res$color<-color
-# max<- ceiling(apply(res[,2:7], 2, function(x) max(x, na.rm = TRUE)) %>% sapply(as.double)) %>% as.vector
-# min<-rep.int(0,6)
-# 
-# par(mfrow=c(3,6))
-# par(mar=c(1,1,1,1))
-# for(i in 1:nrow(res)){
-#   curCol<-(col2rgb(as.character(res$color[i]))%>% as.integer())/255
-#   radarchart(rbind(max,min,res[i,2:7]),
-#              axistype=2 , 
-#              pcol=rgb(curCol[1],curCol[2],curCol[3], alpha = 1) ,
-#              pfcol=rgb(curCol[1],curCol[2],curCol[3],.5) ,
-#              plwd=2 , cglcol="grey", cglty=1, 
-#              axislabcol="black", caxislabels=seq(0,2000,5), cglwd=0.8, vlcex=0.8,
-#              title=as.character(res$Type.1[i]))
-# }
-
 # Modeling
-
-combats<-read.csv('./combats.csv',sep=",",stringsAsFactors=F)
-names <- pokemon %>% select(id, Name)
-
-# Trova i nomi dei contendenti dati gli ID
-combats$First_pokemon_name<-sapply(combats$First_pokemon, function(x) names$Name[match(x, names$id)])
-combats$Second_pokemon_name<-sapply(combats$Second_pokemon, function(x) names$Name[match(x, names$id)])
-combats$Winner_name<-sapply(combats$Winner, function(x) names$Name[match(x, names$id)])
-
-# Definisce quale è il pockemon perdente e trova il suo nome
-combats$loser<-ifelse(combats$Winner==combats$First_pokemon,combats$Second_pokemon,combats$First_pokemon)
-combats$Loser_name<-sapply(combats$loser, function(x) names$Name[match(x, names$id)])
-
-# Integro in combats tutte le caratteristiche dei due contendenti
-combats$Winner_attack<-sapply(combats$Winner_name, function(x) pokemon$Attack[match(x, pokemon$Name)])
-combats$Loser_attack<-sapply(combats$Loser_name, function(x) pokemon$Attack[match(x, pokemon$Name)])
-combats$Winner_HP<-sapply(combats$Winner_name, function(x) pokemon$HP[match(x, pokemon$Name)])
-combats$Loser_HP<-sapply(combats$Loser_name, function(x) pokemon$HP[match(x, pokemon$Name)])
-combats$Winner_defense<-sapply(combats$Winner_name, function(x) pokemon$Defense[match(x, pokemon$Name)])
-combats$Loser_defense<-sapply(combats$Loser_name, function(x) pokemon$Defense[match(x, pokemon$Name)])
-combats$Winner_sp_atk<-sapply(combats$Winner_name, function(x) pokemon$Sp.Atk[match(x, pokemon$Name)])
-combats$Loser_sp_atk<-sapply(combats$Loser_name, function(x) pokemon$Sp.Atk[match(x, pokemon$Name)])
-combats$Winner_sp_def<-sapply(combats$Winner_name, function(x) pokemon$Sp.Def[match(x, pokemon$Name)])
-combats$Loser_sp_def<-sapply(combats$Loser_name, function(x) pokemon$Sp.Def[match(x, pokemon$Name)])
-combats$Winner_speed<-sapply(combats$Winner_name, function(x) pokemon$Speed[match(x, pokemon$Name)])
-combats$Loser_speed<-sapply(combats$Loser_name, function(x) pokemon$Speed[match(x, pokemon$Name)])
-
-# Integro il tipo del pokemon vincente e l'attributo leggendario del pokemon vincente
-combats$winner_type<-sapply(combats$Winner_name, function(x) pokemon$Type.1[match(x, pokemon$Name)])
-combats$winner_legendary<-sapply(combats$Winner_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
-
-# Calcolo alcuni parametri aggiuntivi basandomi sulle caratteristiche dei due contendenti
-combats$diff_atk <- combats$Winner_attack - combats$Loser_attack
-combats$diff_def <- combats$Winner_defense - combats$Loser_defense
-combats$diff_sp_atk <- combats$Winner_sp_atk - combats$Loser_sp_atk
-combats$diff_sp_def <- combats$Winner_sp_def - combats$Loser_sp_def
-combats$diff_speed <- combats$Winner_speed - combats$Loser_speed
-combats$diff_HP <- combats$Winner_HP - combats$Loser_HP
-
-# Genero grafici
-
-# plotFeature <- function(myfeature,myname){
-#   listPlot<-list()
-#   listPlot[[1]]<-ggplot(data=combats,aes_string(x=myfeature)) + geom_histogram(aes(fill=winner_legendary),alpha=.75) + scale_fill_manual(name='legendary',values=c('#46ACC8','#F21A00')) + theme_fivethirtyeight() + ggtitle(paste0('Histogram of the difference \nin ',myname,' between Winner and Loser'))
-#   
-#   listPlot[[2]]<-ggplot(data=combats,aes_string(x=myfeature)) + geom_density(aes(fill=winner_legendary),alpha=.75) + scale_fill_manual(name='legendary',values=c('#46ACC8','#F21A00')) + theme_fivethirtyeight() + ggtitle(paste0('Distribution of the difference \nin ',myname,' between Winner and Loser'))
-#   
-#   return(listPlot)
-# }
-# 
-# do.call(grid.arrange, c(plotFeature('diff_atk','Attack'), ncol=2))
-# do.call(grid.arrange, c(plotFeature('diff_def','Defense'), ncol=2))
-# do.call(grid.arrange, c(plotFeature('diff_sp_atk','SP Attack'), ncol=2))
-# do.call(grid.arrange, c(plotFeature('diff_sp_def','SP Defense'), ncol=2))
-# do.call(grid.arrange, c(plotFeature('diff_speed','Speed'), ncol=2))
-# do.call(grid.arrange, c(plotFeature('diff_HP','HP'), ncol=2))
-# do.call(grid.arrange, c(plotFeature('diff_atk','Attack'), ncol=2))
 
 # Rileggo il file con i combattimenti e risultati per fare il training del modello
 test_combats<-read.csv('./combats.csv',sep=",",stringsAsFactors=F)
-
-names <- pokemon %>% dplyr::select(id, Name)
-#test_combats<-sample_n(test_combats_all, 5e4)
 
 # Trova i nomi dei contendenti dati gli ID
 test_combats$First_pokemon_name<-sapply(test_combats$First_pokemon, function(x) names$Name[match(x, names$id)])
@@ -157,7 +64,7 @@ test_combats$Second_pokemon_type<-sapply(test_combats$Second_pokemon_name, funct
 test_combats$First_pokemon_legendary<-sapply(test_combats$First_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
 test_combats$Second_pokemon_legendary<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
 
-# Fin qui tutto chiaro
+# salvo test_combats su csv
 
 #scale numerical features
 temp<- data.frame(test_combats %>% dplyr::select(winner_first_label,Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary))
@@ -183,25 +90,8 @@ caret::confusionMatrix(res)
 test_pred <- predict(res, newdata = test)
 confusionMatrix(as.factor(test_pred), as.factor(test$winner_first_label))
 
-# Da aggiungere il caricamento del dataset di test (tests.csv) e chiamare il metodo di predizione per ottenere i risultati 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Rileggo il file con i combattimenti e risultati per fare il training del modello
 real_test<-read.csv('./tests.csv',sep=",",stringsAsFactors=F)
-
-names <- pokemon %>% dplyr::select(id, Name)
 
 # Trova i nomi dei contendenti dati gli ID
 real_test$First_pokemon_name<-sapply(real_test$First_pokemon, function(x) names$Name[match(x, names$id)])
@@ -239,8 +129,6 @@ real_test$Second_pokemon_type<-sapply(real_test$Second_pokemon_name, function(x)
 real_test$First_pokemon_legendary<-sapply(real_test$First_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
 real_test$Second_pokemon_legendary<-sapply(real_test$Second_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
 
-# Fin qui tutto chiaro
-
 #scale numerical features
 temp_real_test<- data.frame(real_test %>% dplyr::select(Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary))
 # Determino quali colonne di temp sono attributi di tipo numerico
@@ -250,8 +138,8 @@ temp_real_test[ind] <- lapply(temp_real_test[ind], scale) # Scala le colonne
 
 trControl <- trainControl(method = "cv",number = 5, repeats=3)
 
-#res<-train(winner_first_label~.,data=temp,method='svmLinear',trControl = trControl,metric='Accuracy') # la metrica per scegliere il modello migliore si basa sull'accuratezza
-
 test_real_pred <- predict(res, newdata = temp_real_test)
 
 real_test$winner_first_label<-test_real_pred
+
+# salvo real_test su csv
