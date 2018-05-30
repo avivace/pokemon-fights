@@ -14,14 +14,14 @@ library(magrittr)
 # Importo il file csv con l'elenco di tutti i Pokemon e relative caratteristiche
 pokemon<-read.csv("./pokemon.csv",sep=",",stringsAsFactors=F)
 
-# names contiene l'associazione id-nome del pokemon
-names <- pokemon %>% select(id, Name)
-
 # Attribuisco un nome a parametri
 colnames(pokemon)<-c("id","Name","Type.1","Type.2","HP","Attack","Defense","Sp.Atk","Sp.Def","Speed","Generation","Legendary")
 
 Type.1<-c("Dragon","Steel","Flying","Psychic","Rock" ,"Fire","Electric" ,"Dark","Ghost" ,"Ground","Ice", "Water","Grass","Fighting", "Fairy" ,"Poison","Normal","Bug")
 #color<-c("#6F35FC","#B7B7CE","#A98FF3","#F95587","#B6A136","#EE8130","#F7D02C","#705746","#735797","#E2BF65","#96D9D6","#6390F0","#7AC74C","#C22E28","#D685AD","#A33EA1","#A8A77A","#A6B91A")
+
+# names contiene l'associazione id-nome del pokemon
+names <- pokemon %>% select(id, Name)
 
 # Modeling
 
