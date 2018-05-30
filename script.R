@@ -26,51 +26,51 @@ names <- pokemon %>% select(id, Name)
 # Modeling
 
 # Rileggo il file con i combattimenti e risultati per fare il training del modello
-test_combats<-read.csv('./combats.csv',sep=",",stringsAsFactors=F)
+combats<-read.csv('./combats.csv',sep=",",stringsAsFactors=F)
 
 # Trova i nomi dei contendenti dati gli ID
-test_combats$First_pokemon_name<-sapply(test_combats$First_pokemon, function(x) names$Name[match(x, names$id)])
-test_combats$Second_pokemon_name<-sapply(test_combats$Second_pokemon, function(x) names$Name[match(x, names$id)])
+combats$First_pokemon_name<-sapply(combats$First_pokemon, function(x) names$Name[match(x, names$id)])
+combats$Second_pokemon_name<-sapply(combats$Second_pokemon, function(x) names$Name[match(x, names$id)])
 
 # Vengono recuperati i parametri dei contendenti e calcolate le differenze su alcuni di essi
-test_combats$First_pokemon_attack<-sapply(test_combats$First_pokemon_name, function(x) pokemon$Attack[match(x, pokemon$Name)])
-test_combats$Second_pokemon_attack<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$Attack[match(x, pokemon$Name)])
-test_combats$Diff_attack<-test_combats$First_pokemon_attack - test_combats$Second_pokemon_attack
+combats$First_pokemon_attack<-sapply(combats$First_pokemon_name, function(x) pokemon$Attack[match(x, pokemon$Name)])
+combats$Second_pokemon_attack<-sapply(combats$Second_pokemon_name, function(x) pokemon$Attack[match(x, pokemon$Name)])
+combats$Diff_attack<-combats$First_pokemon_attack - combats$Second_pokemon_attack
 
-test_combats$winner_first_label<-ifelse(test_combats$Winner==test_combats$First_pokemon,'yes','no')
+combats$winner_first_label<-ifelse(combats$Winner==combats$First_pokemon,'yes','no')
 
-test_combats$First_pokemon_defense<-sapply(test_combats$First_pokemon_name, function(x) pokemon$Defense[match(x, pokemon$Name)])
-test_combats$Second_pokemon_defense<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$Defense[match(x, pokemon$Name)])
-test_combats$Diff_defense<-test_combats$First_pokemon_defense - test_combats$Second_pokemon_defense
+combats$First_pokemon_defense<-sapply(combats$First_pokemon_name, function(x) pokemon$Defense[match(x, pokemon$Name)])
+combats$Second_pokemon_defense<-sapply(combats$Second_pokemon_name, function(x) pokemon$Defense[match(x, pokemon$Name)])
+combats$Diff_defense<-combats$First_pokemon_defense - combats$Second_pokemon_defense
 
-test_combats$First_pokemon_sp_defense<-sapply(test_combats$First_pokemon_name, function(x) pokemon$Sp.Def[match(x, pokemon$Name)])
-test_combats$Second_pokemon_sp_defense<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$Sp.Def[match(x, pokemon$Name)])
-test_combats$Diff_sp_defense<-test_combats$First_pokemon_sp_defense - test_combats$Second_pokemon_sp_defense
+combats$First_pokemon_sp_defense<-sapply(combats$First_pokemon_name, function(x) pokemon$Sp.Def[match(x, pokemon$Name)])
+combats$Second_pokemon_sp_defense<-sapply(combats$Second_pokemon_name, function(x) pokemon$Sp.Def[match(x, pokemon$Name)])
+combats$Diff_sp_defense<-combats$First_pokemon_sp_defense - combats$Second_pokemon_sp_defense
 
-test_combats$First_pokemon_sp_attack<-sapply(test_combats$First_pokemon_name, function(x) pokemon$Sp.Atk[match(x, pokemon$Name)])
-test_combats$Second_pokemon_sp_attack<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$Sp.Atk[match(x, pokemon$Name)])
-test_combats$Diff_sp_attack<-test_combats$First_pokemon_sp_attack - test_combats$Second_pokemon_sp_attack
+combats$First_pokemon_sp_attack<-sapply(combats$First_pokemon_name, function(x) pokemon$Sp.Atk[match(x, pokemon$Name)])
+combats$Second_pokemon_sp_attack<-sapply(combats$Second_pokemon_name, function(x) pokemon$Sp.Atk[match(x, pokemon$Name)])
+combats$Diff_sp_attack<-combats$First_pokemon_sp_attack - combats$Second_pokemon_sp_attack
 
-test_combats$First_pokemon_speed<-sapply(test_combats$First_pokemon_name, function(x) pokemon$Speed[match(x, pokemon$Name)])
-test_combats$Second_pokemon_speed<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$Speed[match(x, pokemon$Name)])
-test_combats$Diff_speed<-test_combats$First_pokemon_speed - test_combats$Second_pokemon_speed
+combats$First_pokemon_speed<-sapply(combats$First_pokemon_name, function(x) pokemon$Speed[match(x, pokemon$Name)])
+combats$Second_pokemon_speed<-sapply(combats$Second_pokemon_name, function(x) pokemon$Speed[match(x, pokemon$Name)])
+combats$Diff_speed<-combats$First_pokemon_speed - combats$Second_pokemon_speed
 
-test_combats$First_pokemon_HP<-sapply(test_combats$First_pokemon_name, function(x) pokemon$HP[match(x, pokemon$Name)])
-test_combats$Second_pokemon_HP<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$HP[match(x, pokemon$Name)])
-test_combats$Diff_HP<-test_combats$First_pokemon_HP - test_combats$Second_pokemon_HP
+combats$First_pokemon_HP<-sapply(combats$First_pokemon_name, function(x) pokemon$HP[match(x, pokemon$Name)])
+combats$Second_pokemon_HP<-sapply(combats$Second_pokemon_name, function(x) pokemon$HP[match(x, pokemon$Name)])
+combats$Diff_HP<-combats$First_pokemon_HP - combats$Second_pokemon_HP
 
-test_combats$First_pokemon_type<-sapply(test_combats$First_pokemon_name, function(x) pokemon$Type.1[match(x, pokemon$Name)])
-test_combats$Second_pokemon_type<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$Type.1[match(x, pokemon$Name)])
-test_combats$First_pokemon_legendary<-sapply(test_combats$First_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
-test_combats$Second_pokemon_legendary<-sapply(test_combats$Second_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
+combats$First_pokemon_type<-sapply(combats$First_pokemon_name, function(x) pokemon$Type.1[match(x, pokemon$Name)])
+combats$Second_pokemon_type<-sapply(combats$Second_pokemon_name, function(x) pokemon$Type.1[match(x, pokemon$Name)])
+combats$First_pokemon_legendary<-sapply(combats$First_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
+combats$Second_pokemon_legendary<-sapply(combats$Second_pokemon_name, function(x) pokemon$Legendary[match(x, pokemon$Name)])
 
-# salvo test_combats su csv
+# salvo combats su csv
 
 #scale numerical features
-temp<- data.frame(test_combats %>% dplyr::select(winner_first_label,Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary))
+temp<- data.frame(combats %>% dplyr::select(winner_first_label,Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary))
 # Determino quali colonne di temp sono attributi di tipo numerico
 ind <- sapply(temp, is.numeric)
-# temp[ind] contiene solo le colonne di test_combats aventi valori di tipo numerico
+# temp[ind] contiene solo le colonne di combats aventi valori di tipo numerico
 temp[ind] <- lapply(temp[ind], scale) # Scala le colonne
 
 # Garanzia di riproduzione dei risultati
@@ -81,14 +81,22 @@ split <- createDataPartition(y=temp$winner_first_label, p = 0.75, list = FALSE)
 train <- temp[split,]
 test <- temp[-split,]
 
-trControl <- trainControl(method = "cv",number = 5, repeats=3)
+trControl <- trainControl(method = "cv",number = 10)
 
 res<-train(winner_first_label~.,data=train,method='svmLinear',trControl = trControl,metric='Accuracy') # la metrica per scegliere il modello migliore si basa sull'accuratezza
 
-caret::confusionMatrix(res)
+cm <- caret::confusionMatrix(res)
+
+precision <- cm$table[1]/(cm$table[1]+cm$table[2])
+recall <- cm$table[1]/(cm$table[1]+cm$table[3])
+f <- (2*precision*recall)/(precision+recall)
 
 test_pred <- predict(res, newdata = test)
-confusionMatrix(as.factor(test_pred), as.factor(test$winner_first_label))
+cm_pred <- confusionMatrix(as.factor(test_pred), as.factor(test$winner_first_label))
+
+precision_pred <- cm_pred$table[1]/(cm_pred$table[1]+cm_pred$table[2])
+recall_pred <- cm_pred$table[1]/(cm_pred$table[1]+cm_pred$table[3])
+f_pred <- (2*precision_pred*recall_pred)/(precision_pred+recall_pred)
 
 # Rileggo il file con i combattimenti e risultati per fare il training del modello
 real_test<-read.csv('./tests.csv',sep=",",stringsAsFactors=F)
@@ -136,10 +144,66 @@ ind <- sapply(temp_real_test, is.numeric)
 # temp[ind] contiene solo le colonne di real_test aventi valori di tipo numerico
 temp_real_test[ind] <- lapply(temp_real_test[ind], scale) # Scala le colonne
 
-trControl <- trainControl(method = "cv",number = 5, repeats=3)
-
 test_real_pred <- predict(res, newdata = temp_real_test)
 
 real_test$winner_first_label<-test_real_pred
 
 # salvo real_test su csv
+
+# stampo parametri
+print(cm)
+print(precision)
+print(recall)
+print(f)
+
+print(cm_pred)
+print(precision_pred)
+print(recall_pred)
+print(f_pred)
+
+# atk<-c('Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy')
+# normal<-c(1,1,1,1,1,1,2,1,1,1,1,1,1,0,1,1,1,1)
+# fire<-c(1,0.5,2,1,0.5,0.5,1,1,2,1,1,0.5,2,1,1,1,0.5,0.5)
+# water<-c(1,0.5,0.5,2,2,0.5,1,1,1,1,1,1,1,1,1,1,0.5,1)
+# elec<-c(1,1,1,0.5,1,1,1,1,2,0.5,1,1,1,1,1,1,0.5,1)
+# grass<-c(1,2,0.5,0.5,0.5,2,1,2,0.5,2,1,2,1,1,1,1,1,1)
+# ice<-c(1,2,1,1,1,0.5,2,1,1,1,1,1,2,1,1,1,2,1)
+# fighting<-c(1,1,1,1,1,1,1,1,1,2,2,0.5,0.5,1,1,0.5,1,2)
+# poison<-c(1,1,1,1,0.5,1,0.5,0.5,2,1,2,0.5,1,1,1,1,1,0.5)
+# ground<-c(1,1,2,0,2,2,1,0.5,1,1,1,1,0.5,1,1,1,1,1)
+# flying<-c(1,1,1,2,0.5,2,0.5,1,0,1,1,0.5,2,1,1,1,1,1)
+# psychic<-c(1,1,1,1,1,1,0.5,1,1,1,0.5,2,1,2,1,2,1,1)
+# bug<-c(1,2,1,1,0.5,1,0.5,1,0.5,2,1,1,2,1,1,1,1,1)
+# rock<-c(0.5,0.5,2,1,2,1,2,0.5,2,0.5,1,1,1,1,1,1,2,1)
+# ghost<-c(0,1,1,1,1,1,0,0.5,1,1,1,0.5,1,2,1,2,1,1)
+# dragon<-c(1,0.5,0.5,0.5,0.5,2,1,1,1,1,1,1,1,1,2,1,1,2)
+# dark<-c(1,1,1,1,1,1,2,1,1,1,0,2,1,0.5,1,0.5,1,2)
+# steel<-c(0.5,2,1,1,0.5,0.5,2,0,2,0.5,0.5,0.5,0.5,1,0.5,1,0.5,0.5)
+# fairy<-c(1,1,1,1,1,1,0.5,2,1,1,1,0.5,1,1,0,0.5,2,1)
+# mytable<-data.frame(Attacking=atk,Normal=normal,Fire=fire,Water=water,Electric=elec,Grass=grass,Ice=ice,Fighting=fighting,Poison=poison,Ground=ground,Flying=flying,Psychic=psychic,Bug=bug,Rock=rock,Ghost=ghost,Dragon=dragon,Dark=dark,Steel=steel,Fairy=fairy)
+# 
+# 
+# combats$First_pokemon_type<-sapply(combats$First_pokemon,function(x) pokemon$Type.1[match(x, pokemon$id)])
+# combats$Second_pokemon_type<-sapply(combats$Second_pokemon,function(x) pokemon$Type.1[match(x, pokemon$id)])
+# combats[2,c('First_pokemon_type','Second_pokemon_type')]
+# 
+# mytable[ which(mytable$Attacking==combats$First_pokemon_type[2]),c(combats$Second_pokemon_type[2])]
+# 
+# makeAdvantage2<-function(type_1,type_2){
+#   val <- mytable[ which(mytable$Attacking==type_1),c(type_2)]
+#   if(val==0){
+#     return('no effect')
+#   }
+#   else if(val==0.5){
+#     return('not too effective')
+#   }
+#   else if(val==1){
+#     return('normal')
+#   }
+#   else if(val==2){
+#     return('effective')
+#   }
+# }
+# combats$advantage<-mapply(makeAdvantage2, combats$First_pokemon_type, combats$Second_pokemon_type)
+
+
