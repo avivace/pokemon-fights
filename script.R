@@ -1,12 +1,7 @@
 # Librerie da importare ed installare se non presenti
 library(ggplot2)
 library(dplyr)
-library(gridExtra)
-library(corrplot)
 library(caret)
-library(ggthemes)
-library(RColorBrewer)
-library(fmsb)
 library(rpart.plot)
 library(ROCR)
 library(magrittr)
@@ -240,9 +235,7 @@ auc <- performance(pred, measure = "auc")
 auc <- round(auc@y.values[[1]],3)
 g <- ggplot(roc.data, aes(x=fpr, ymin=0, ymax=tpr)) + 
   geom_ribbon(alpha=0.2) + geom_line(aes(y=tpr)) + 
-  labs(title= paste0("ROC Curve for Tree with advantage feature w/AUC=", auc),
-       subtitle = "x-axis is False Positive Rate\ny-axis is True Positive rate") + 
-  theme_fivethirtyeight()
+  labs(title= paste0("ROC CURVE AUC = ", auc))
 g <- g + geom_segment(x = 0, y = 0, xend = 1, yend = 1, colour = 'red')
 g
 
