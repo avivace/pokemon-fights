@@ -116,7 +116,8 @@ combats %>%
   dplyr::group_by(advantage) %>% 
   dplyr::mutate(perc = count / sum(count))
 
-temp <- data.frame(combats %>% dplyr::select(winner_first_label,Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary, advantage))
+#temp <- data.frame(combats %>% dplyr::select(winner_first_label,Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary, advantage))
+temp <- data.frame(combats %>% dplyr::select(winner_first_label,Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary))
 ind <- sapply(temp, is.numeric)
 temp[ind] <- lapply(temp[ind], scale)
 
@@ -129,7 +130,8 @@ train <- temp[split,]
 test <- temp[-split,]
 
 # Training del modello
-res.tree<-train(winner_first_label~Diff_attack+Diff_defense+Diff_sp_defense+Diff_sp_attack+Diff_speed+Diff_HP+First_pokemon_legendary+Second_pokemon_legendary+advantage,data=train,method='rpart',trControl = trainControl(method = "cv",number = 10))
+#res.tree<-train(winner_first_label~Diff_attack+Diff_defense+Diff_sp_defense+Diff_sp_attack+Diff_speed+Diff_HP+First_pokemon_legendary+Second_pokemon_legendary+advantage,data=train,method='rpart',trControl = trainControl(method = "cv",number = 10))
+res.tree<-train(winner_first_label~Diff_attack+Diff_defense+Diff_sp_defense+Diff_sp_attack+Diff_speed+Diff_HP+First_pokemon_legendary+Second_pokemon_legendary,data=train,method='rpart',trControl = trainControl(method = "cv",number = 10))
 
 # Testing del Modello
 probs <- predict(res.tree, newdata=test, type='prob')
@@ -143,7 +145,7 @@ probs$winner_first_num<-ifelse(probs$winner_first=='no',0,1)
 rpart.plot(res.tree$finalModel)
 
 # Mostro grafico sull'importanza delle feature
-plot(caret::varImp(res.tree))
+# plot(caret::varImp(res.tree))
 
 # Determino la confusionMatrix del modello 
 cm <- caret::confusionMatrix(res.tree)
@@ -203,7 +205,9 @@ real_test$Second_pokemon_legendary<-sapply(real_test$Second_pokemon_name, functi
 real_test$advantage<-mapply(makeAdvantage2, real_test$First_pokemon_type, real_test$Second_pokemon_type)
 
 #scale numerical features
-temp_real_test<- data.frame(real_test %>% dplyr::select(Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary, advantage))
+#temp_real_test<- data.frame(real_test %>% dplyr::select(Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary, advantage))
+temp_real_test<- data.frame(real_test %>% dplyr::select(Diff_attack ,Diff_defense, Diff_sp_defense,Diff_sp_attack,Diff_speed ,Diff_HP, First_pokemon_legendary, Second_pokemon_legendary))
+
 # Determino quali colonne di temp sono attributi di tipo numerico
 ind <- sapply(temp_real_test, is.numeric)
 # temp[ind] contiene solo le colonne di real_test aventi valori di tipo numerico
