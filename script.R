@@ -14,32 +14,11 @@ pokemon<-read.csv("./pokemon.csv",sep=",",stringsAsFactors=F)
 # Importo il file csv con i combattimenti e i risultati per fare il training ed il testing del modello
 combats<-read.csv('./combats.csv',sep=",",stringsAsFactors=F)
 
+# Importo il file csv contenente informazioni riguardo le relazioni tra tipi di pokemon in merito alla proprietà di attacco
+pokemonTypeComp<-read.csv("./pokemonTypeComp.csv",sep=",", stringsAsFactors=F)
+
 # Importo il file con i combattimenti privi di risultati per mostrare un esempio di applicazione "Reale" del modello di ML
 real_test<-read.csv('./tests.csv',sep=",",stringsAsFactors=F)
-
-# Importo il file csv contenente informazioni riguardo le relazioni tra tipi di pokemon in merito alla proprietà di attacco
-# Meglio sostituirlo con un csv
-atk<-c('Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy')
-normal<-c(1,1,1,1,1,1,2,1,1,1,1,1,1,0,1,1,1,1)
-fire<-c(1,0.5,2,1,0.5,0.5,1,1,2,1,1,0.5,2,1,1,1,0.5,0.5)
-water<-c(1,0.5,0.5,2,2,0.5,1,1,1,1,1,1,1,1,1,1,0.5,1)
-elec<-c(1,1,1,0.5,1,1,1,1,2,0.5,1,1,1,1,1,1,0.5,1)
-grass<-c(1,2,0.5,0.5,0.5,2,1,2,0.5,2,1,2,1,1,1,1,1,1)
-ice<-c(1,2,1,1,1,0.5,2,1,1,1,1,1,2,1,1,1,2,1)
-fighting<-c(1,1,1,1,1,1,1,1,1,2,2,0.5,0.5,1,1,0.5,1,2)
-poison<-c(1,1,1,1,0.5,1,0.5,0.5,2,1,2,0.5,1,1,1,1,1,0.5)
-ground<-c(1,1,2,0,2,2,1,0.5,1,1,1,1,0.5,1,1,1,1,1)
-flying<-c(1,1,1,2,0.5,2,0.5,1,0,1,1,0.5,2,1,1,1,1,1)
-psychic<-c(1,1,1,1,1,1,0.5,1,1,1,0.5,2,1,2,1,2,1,1)
-bug<-c(1,2,1,1,0.5,1,0.5,1,0.5,2,1,1,2,1,1,1,1,1)
-rock<-c(0.5,0.5,2,1,2,1,2,0.5,2,0.5,1,1,1,1,1,1,2,1)
-ghost<-c(0,1,1,1,1,1,0,0.5,1,1,1,0.5,1,2,1,2,1,1)
-dragon<-c(1,0.5,0.5,0.5,0.5,2,1,1,1,1,1,1,1,1,2,1,1,2)
-dark<-c(1,1,1,1,1,1,2,1,1,1,0,2,1,0.5,1,0.5,1,2)
-steel<-c(0.5,2,1,1,0.5,0.5,2,0,2,0.5,0.5,0.5,0.5,1,0.5,1,0.5,0.5)
-fairy<-c(1,1,1,1,1,1,0.5,2,1,1,1,0.5,1,1,0,0.5,2,1)
-
-mytable<-data.frame(Attacking=atk,Normal=normal,Fire=fire,Water=water,Electric=elec,Grass=grass,Ice=ice,Fighting=fighting,Poison=poison,Ground=ground,Flying=flying,Psychic=psychic,Bug=bug,Rock=rock,Ghost=ghost,Dragon=dragon,Dark=dark,Steel=steel,Fairy=fairy)
 
 # Definisco il nome delle colonne di pokemon
 colnames(pokemon)<-c("id","Name","Type.1","Type.2","HP","Attack","Defense","Sp.Atk","Sp.Def","Speed","Generation","Legendary")
@@ -86,9 +65,9 @@ combats$Second_pokemon_legendary<-sapply(combats$Second_pokemon_name, function(x
 # Determino attributo winner_first_label per la tabella combats
 combats$winner_first_label<-ifelse(combats$Winner==combats$First_pokemon,'yes','no')
 
-# Funzione utilizzata per ottenere informazione sulla relazione tra due pokemon avversari (informazione contenuta in mytable)
+# Funzione utilizzata per ottenere informazione sulla relazione tra due pokemon avversari (informazione contenuta in pokemonTypeComp)
 makeAdvantage2<-function(type_1,type_2){
-  val <- mytable[ which(mytable$Attacking==type_1),c(type_2)]
+  val <- pokemonTypeComp[ which(pokemonTypeComp$Attacking==type_1),c(type_2)]
   if(val==0){
     return('no effect')
   }
@@ -107,6 +86,7 @@ makeAdvantage2<-function(type_1,type_2){
 combats$advantage<-mapply(makeAdvantage2, combats$First_pokemon_type, combats$Second_pokemon_type)
 
 # salvo combats su csv
+write.csv (combats, file = "integrated.csv")
 
 # Mostro distrubuzione percentuale sulla base di advantage in relazione al fatto di essere il pokemon che attacca per primo
 combats %>% 
@@ -218,6 +198,7 @@ test_real_pred <- predict(res.tree, newdata=temp_real_test, type='prob')
 real_test$winner_first_label<-test_real_pred
 
 # salvo real_test su csv
+write.csv(real_test[,c("First_pokemon","Second_pokemon","winner_first_label")], file="real_tests_result.csv")
 
 # stampo parametri
 print(cm)
@@ -243,3 +224,77 @@ g <- ggplot(roc.data, aes(x=fpr, ymin=0, ymax=tpr)) +
 g <- g + geom_segment(x = 0, y = 0, xend = 1, yend = 1, colour = 'red')
 g
 
+# Parte DT
+
+# Misure di qualità dataset Pokemon
+
+# Percentuale valori nulli per singolo attributo
+na_count_pokemon <-sapply(pokemon, function(y) sum(length(which(y==""))))
+Completness_pokemon <- na_count_pokemon/length(pokemon$id)
+Completness_pokemon  
+
+#evitabile serve per scoprire a quale pokemon manca il nome  
+na_index <-sapply(pokemon, function(y) which(y==""))
+na_1 <-sapply(combats, function(y) which(y==63))
+
+# Unicità percentuale per singolo attributo
+unique_count_pokemon <- sapply(pokemon, function(y) sum(length(unique(y))))
+Uniqueness_pokemon <- unique_count_pokemon/length(pokemon$id)
+Uniqueness_pokemon
+
+# Misure di qualità dataset Combats
+
+# Misure di qualità dataset pokemonTypeComp
+
+# Misure di qualità dataset Tests
+
+# Percentuale valori nulli per singolo attributo
+na_count_real_test <-sapply(real_test, function(y) sum(length(which(y==""))))
+Completness_real_test <- na_count_real_test/length(real_test$First_pokemon)
+Completness_real_test 
+
+# Unicità percentuale per singolo attributo
+unique_count_real_test<- sapply(real_test, function(y) sum(length(unique(y))))
+Uniqueness_real_test <- unique_count_real_test/length(real_test$First_pokemon)
+Uniqueness_real_test
+
+
+# Misure di qualità dataset Integrato
+
+# Percentuale valori nulli per singolo attributo
+na_count_combats_integrated <-sapply(combats, function(y) sum(length(which(y==""))))
+Completness_combats_integrated <- na_count_combats_integrated/length(combats$First_pokemon)
+Completness_combats_integrated
+
+# Unicità percentuale per singolo attributo
+unique_count_combats_integrated  <- sapply(combats, function(y) sum(length(unique(y))))
+Uniqueness_combats_integrated  <- unique_count_combats_integrated/length(combats$First_pokemon)
+Uniqueness_combats_integrated
+
+
+
+
+na_count <-sapply(pokemon, function(x) sum(length(which(x==""))))
+
+na_count <-sapply(combats, function(x) sum(length(which(is.na(x)))))
+na_count1 <-sapply(combats, function(x) which(x==63))
+na_count1 <-sapply(combats, function(x) which(x==63))
+uniq <-sapply(pokemon, function(x) sum(length(unique(x))))
+
+sum(length(unique(combats$Second_pokemon,combats$First_pokemon)))
+
+
+
+
+
+
+#da mettere prima dell'integrazione
+
+na_count_combats <-sapply(combats, function(y) sum(length(which(y==""))))
+Completness_combats <- na_count_combats/length(combats$First_pokemon)
+Completness_combats
+
+#unicità tra le coppie di combattenti
+unique_versus <- sum(length(unique(combats$First_pokemon, combats$Second_pokemon)))
+Uniqueness_versus <- unique_versus/length(combats$First_pokemon)
+Uniqueness_versus
