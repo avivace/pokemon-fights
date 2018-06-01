@@ -26,6 +26,50 @@ colnames(pokemon)<-c("id","Name","Type.1","Type.2","HP","Attack","Defense","Sp.A
 # Definisco l'associazione id-nome del pokemon
 names <- pokemon %>% select(id, Name)
 
+# Misure di qualità Dataset Singoli non integrati
+
+# Misure di qualità dataset Pokemon
+
+# Percentuale valori nulli per singolo attributo
+na_count_pokemon <-sapply(pokemon, function(y) sum(length(which(y==""))))
+Completness_pokemon <- na_count_pokemon/length(pokemon$id)
+Completness_pokemon  
+
+#evitabile serve per scoprire a quale pokemon manca il nome  
+na_index <-sapply(pokemon, function(y) which(y==""))
+na_1 <-sapply(combats, function(y) which(y==63))
+
+# Unicità percentuale per singolo attributo
+unique_count_pokemon <- sapply(pokemon, function(y) sum(length(unique(y))))
+Uniqueness_pokemon <- unique_count_pokemon/length(pokemon$id)
+Uniqueness_pokemon
+
+# Misure di qualità dataset Combats
+
+# Percentuale valori nulli per singolo attributo
+na_count_combats <-sapply(combats, function(y) sum(length(which(y==""))))
+Completness_combats <- na_count_combats/length(combats$First_pokemon)
+Completness_combats
+
+# Unicità percentuale tra le coppie di combattenti
+unique_versus <- sum(length(unique(combats$First_pokemon, combats$Second_pokemon)))
+Uniqueness_versus <- unique_versus/length(combats$First_pokemon)
+Uniqueness_versus
+
+# Misure di qualità dataset pokemonTypeComp
+
+# Misure di qualità dataset Tests
+
+# Percentuale valori nulli per singolo attributo
+na_count_real_test <-sapply(real_test, function(y) sum(length(which(y==""))))
+Completness_real_test <- na_count_real_test/length(real_test$First_pokemon)
+Completness_real_test 
+
+# Unicità percentuale per singolo attributo
+unique_count_real_test<- sapply(real_test, function(y) sum(length(unique(y))))
+Uniqueness_real_test <- unique_count_real_test/length(real_test$First_pokemon)
+Uniqueness_real_test
+
 # Integrazione dei dati provenienti dai diversi Dataset
 
 # Integro in combats il nome dei pokemon avversari ricercandoli tramite il loro id
@@ -87,6 +131,18 @@ combats$advantage<-mapply(makeAdvantage2, combats$First_pokemon_type, combats$Se
 
 # salvo combats su csv
 write.csv (combats, file = "integrated.csv")
+
+# Misure di qualità dataset Integrato
+
+# Percentuale valori nulli per singolo attributo
+na_count_combats_integrated <-sapply(combats, function(y) sum(length(which(y==""))))
+Completness_combats_integrated <- na_count_combats_integrated/length(combats$First_pokemon)
+Completness_combats_integrated
+
+# Unicità percentuale per singolo attributo
+unique_count_combats_integrated  <- sapply(combats, function(y) sum(length(unique(y))))
+Uniqueness_combats_integrated  <- unique_count_combats_integrated/length(combats$First_pokemon)
+Uniqueness_combats_integrated
 
 # Mostro distrubuzione percentuale sulla base di advantage in relazione al fatto di essere il pokemon che attacca per primo
 combats %>% 
@@ -224,77 +280,11 @@ g <- ggplot(roc.data, aes(x=fpr, ymin=0, ymax=tpr)) +
 g <- g + geom_segment(x = 0, y = 0, xend = 1, yend = 1, colour = 'red')
 g
 
-# Parte DT
-
-# Misure di qualità dataset Pokemon
-
-# Percentuale valori nulli per singolo attributo
-na_count_pokemon <-sapply(pokemon, function(y) sum(length(which(y==""))))
-Completness_pokemon <- na_count_pokemon/length(pokemon$id)
-Completness_pokemon  
-
-#evitabile serve per scoprire a quale pokemon manca il nome  
-na_index <-sapply(pokemon, function(y) which(y==""))
-na_1 <-sapply(combats, function(y) which(y==63))
-
-# Unicità percentuale per singolo attributo
-unique_count_pokemon <- sapply(pokemon, function(y) sum(length(unique(y))))
-Uniqueness_pokemon <- unique_count_pokemon/length(pokemon$id)
-Uniqueness_pokemon
-
-# Misure di qualità dataset Combats
-
-# Misure di qualità dataset pokemonTypeComp
-
-# Misure di qualità dataset Tests
-
-# Percentuale valori nulli per singolo attributo
-na_count_real_test <-sapply(real_test, function(y) sum(length(which(y==""))))
-Completness_real_test <- na_count_real_test/length(real_test$First_pokemon)
-Completness_real_test 
-
-# Unicità percentuale per singolo attributo
-unique_count_real_test<- sapply(real_test, function(y) sum(length(unique(y))))
-Uniqueness_real_test <- unique_count_real_test/length(real_test$First_pokemon)
-Uniqueness_real_test
-
-
-# Misure di qualità dataset Integrato
-
-# Percentuale valori nulli per singolo attributo
-na_count_combats_integrated <-sapply(combats, function(y) sum(length(which(y==""))))
-Completness_combats_integrated <- na_count_combats_integrated/length(combats$First_pokemon)
-Completness_combats_integrated
-
-# Unicità percentuale per singolo attributo
-unique_count_combats_integrated  <- sapply(combats, function(y) sum(length(unique(y))))
-Uniqueness_combats_integrated  <- unique_count_combats_integrated/length(combats$First_pokemon)
-Uniqueness_combats_integrated
-
-
-
-
-na_count <-sapply(pokemon, function(x) sum(length(which(x==""))))
-
-na_count <-sapply(combats, function(x) sum(length(which(is.na(x)))))
-na_count1 <-sapply(combats, function(x) which(x==63))
-na_count1 <-sapply(combats, function(x) which(x==63))
-uniq <-sapply(pokemon, function(x) sum(length(unique(x))))
-
-sum(length(unique(combats$Second_pokemon,combats$First_pokemon)))
-
-
-
-
-
-
-#da mettere prima dell'integrazione
-
-na_count_combats <-sapply(combats, function(y) sum(length(which(y==""))))
-Completness_combats <- na_count_combats/length(combats$First_pokemon)
-Completness_combats
-
-#unicità tra le coppie di combattenti
-unique_versus <- sum(length(unique(combats$First_pokemon, combats$Second_pokemon)))
-Uniqueness_versus <- unique_versus/length(combats$First_pokemon)
-Uniqueness_versus
+# na_count <-sapply(pokemon, function(x) sum(length(which(x==""))))
+# 
+# na_count <-sapply(combats, function(x) sum(length(which(is.na(x)))))
+# na_count1 <-sapply(combats, function(x) which(x==63))
+# na_count1 <-sapply(combats, function(x) which(x==63))
+# uniq <-sapply(pokemon, function(x) sum(length(unique(x))))
+# 
+# sum(length(unique(combats$Second_pokemon,combats$First_pokemon)))
