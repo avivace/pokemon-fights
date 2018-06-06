@@ -58,7 +58,11 @@ Uniqueness_versus
 
 # Misure di qualità dataset pokemonTypeComp
 
-# Misure di qualità dataset Tests
+# Aggiungere percentuale valori nulli per singolo attributo
+
+  # Aggiungere altra misura di qualità diversa dall'unicità (poco senso)
+
+  # Misure di qualità dataset Tests
 
 # Percentuale valori nulli per singolo attributo
 na_count_real_test <-sapply(real_test, function(y) sum(length(which(y==""))))
