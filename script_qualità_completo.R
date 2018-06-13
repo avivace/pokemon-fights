@@ -66,7 +66,7 @@ Completness_type <- na_count_type/length(pokemonTypeComp$Attacking)
 unique_count_type<- sapply(pokemonTypeComp, function(y) sum(length(unique(y))))
 Uniqueness_type <- unique_count_type/length(pokemonTypeComp$Attacking)
 
-# Misure di qualità dataset Tests (forse da togliere)
+# Misure di qualità dataset Tests
 
 # Percentuale valori nulli per singolo attributo
 na_count_real_test <-sapply(real_test, function(y) sum(length(which(y==""))))
