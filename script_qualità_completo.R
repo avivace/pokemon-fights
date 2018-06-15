@@ -185,7 +185,7 @@ probs$winner_first_num<-ifelse(probs$winner_first=='no',0,1)
 rpart.plot(res.tree$finalModel)
 
 # Mostro grafico sull'importanza delle feature
-# plot(caret::varImp(res.tree))
+plot(caret::varImp(res.tree))
 
 # Determino la confusionMatrix del modello 
 cm <- caret::confusionMatrix(res.tree)
@@ -329,4 +329,3 @@ Completness_combats_integrated
 
 # Unicità percentuale per singolo attributo
 Uniqueness_combats_integrated
-
