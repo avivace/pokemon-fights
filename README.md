@@ -1,5 +1,5 @@
 # Pokèmon Fights
-### _Predicting Pokèmon fights outcomes_
+### _Predicting Pokèmon fights outcomes using Decision Trees_
 
 By [Marco Belotti](https://github.com/marcoBelotti), [Francesco Bombarda](https://github.com/FBombarda), [Antonio Vivace](https://github.com/avivace).
 
