@@ -3,4 +3,4 @@
 
 By [Marco Belotti](https://github.com/marcoBelotti), [Francesco Bombarda](https://github.com/FBombarda), [Antonio Vivace](https://github.com/avivace).
 
-Data Technology and Machine Learning (CS MSc) exam final project. Academic year 2017/2018.
+Data Technology and Machine Learning ([Computer Science MSc](https://github.com/avivace/compsci)) exam final project. Academic year 2017/2018.
